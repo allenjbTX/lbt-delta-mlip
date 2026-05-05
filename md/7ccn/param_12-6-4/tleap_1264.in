@@ -1,0 +1,9 @@
+source leaprc.protein.ff14SB
+source leaprc.water.tip3p
+loadamberparams frcmod.ions234lm_1264_tip3p
+mol = loadpdb 7ccn_clean.pdb
+solvatebox mol TIP3PBOX 10.0
+addions mol Na+ 0
+savepdb mol 7ccn_solv.pdb
+saveamberparm mol 7ccn_solv.prmtop 7ccn_solv.inpcrd
+quit

@@ -1,0 +1,4 @@
+loadRestrt 7ccn_solv.inpcrd
+setOverwrite True
+add12_6_4 :LU watermodel TIP3P
+outparm 7ccn_solv_1264.prmtop 7ccn_solv_1264.inpcrd
