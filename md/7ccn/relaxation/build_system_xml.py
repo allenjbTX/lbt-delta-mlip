@@ -30,8 +30,8 @@ OUT_SYSTEM_XML = "system.xml"
 OUT_TOPOLOGY_PDB = "system.pdb"
 
 CUTOFF_NM = 1.0          # 10 A, matches the relaxation
-USE_HBOND_CONSTRAINTS = True   
-USE_RIGID_WATER = True
+USE_HBOND_CONSTRAINTS = False   
+USE_RIGID_WATER = False
 
 # ============================================================================
 # Build the System through ParmEd (required for 12-6-4)
