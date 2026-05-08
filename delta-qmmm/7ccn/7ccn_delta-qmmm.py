@@ -29,9 +29,6 @@ mm = ash.OpenMMTheory(
     rigidwater=False
 )
 
-# 0.2 Å makes zeta = 7 Bohr^{-2}, effectively a point charge
-radii = np.full(mm.system.getNumParticles(), 0.2) 
-
 qm_xtb = ash.xTBTheory(xtbmethod="GFN2")
 
 qm_pyscf = ash.PySCFTheory(
