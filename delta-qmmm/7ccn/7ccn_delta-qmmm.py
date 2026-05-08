@@ -21,7 +21,7 @@ qm_atoms = get_qm_atoms_from_pdb(qm_region_pdb)
 print(f"QM atoms: {qm_atoms}")
 
 # MM theory built from the System XML (carries the 12-6-4 forces) + topology PDB
-mm = ash.OpenMMTheory(
+mm = OpenMMTheory(
     xmlsystemfile=xmlsystemfile, 
     pdbfile=topology_pdb,
     periodic=True, 
@@ -29,9 +29,9 @@ mm = ash.OpenMMTheory(
     rigidwater=False
 )
 
-qm_xtb = ash.xTBTheory(xtbmethod="GFN2")
+qm_xtb = xTBTheory(xtbmethod="GFN2")
 
-qm_pyscf = ash.PySCFTheory(
+qm_pyscf = PySCFTheory(
     scf_type="RKS", 
     functional="r2scan",
     basis="def2-mtzvpp", 
@@ -51,7 +51,7 @@ gcp_corr = gcpTheory(functional="r2SCAN-3c")
 d4_corr = DFTD4Theory(functional="r2SCAN-3c")
 qm_r2scan3c = WrapTheory(theories=[qm_pyscf, gcp_corr, d4_corr])
 
-xtbmm = ash.QMMMTheory(
+xtbmm = QMMMTheory(
     fragment=frag, 
     qm_theory=qm_xtb,
     mm_theory=mm, 
@@ -62,7 +62,7 @@ xtbmm = ash.QMMMTheory(
     printlevel=2
 )
 
-dftmm = ash.QMMMTheory(
+dftmm = QMMMTheory(
     fragment=frag, 
     qm_theory=qm_r2scan3c,
     mm_theory=mm, 
