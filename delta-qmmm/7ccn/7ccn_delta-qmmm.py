@@ -17,59 +17,8 @@ def get_qm_atoms_from_pdb(pdbfile):
                 qm_atoms.append(idx)
     return qm_atoms
 
-def get_lattice_vectors_from_pdb(pdbfile):
-    """Return 3x3 lattice matrix (Angstrom) from CRYST1 record. Each row is a vector."""
-    import numpy as np
-    with open(pdbfile, 'r') as f:
-        for line in f:
-            if line.startswith("CRYST1"):
-                parts = line.split()
-                a, b, c = float(parts[1]), float(parts[2]), float(parts[3])
-                alpha = np.deg2rad(float(parts[4]))
-                beta  = np.deg2rad(float(parts[5]))
-                gamma = np.deg2rad(float(parts[6]))
-                ax = a
-                bx = b * np.cos(gamma)
-                by = b * np.sin(gamma)
-                cx = c * np.cos(beta)
-                cy = c * (np.cos(alpha) - np.cos(beta) * np.cos(gamma)) / np.sin(gamma)
-                cz = np.sqrt(max(c**2 - cx**2 - cy**2, 0.0))
-                return np.array([[ax, 0.0, 0.0],
-                                 [bx, by,  0.0],
-                                 [cx, cy,  cz]])
-    raise ValueError("No CRYST1 record found in PDB file.")
-
-def get_rcut_hcore_ewald(frag, qm_atoms, lattice_vectors):
-    qm_coords = np.array([frag.coords[i] for i in qm_atoms])
-    qm_center = qm_coords.mean(axis=0)
-    r = qm_coords - qm_center  # relative positions
-
-    # Lower bound: farthest QM atom from centroid
-    lower = np.max(np.linalg.norm(r, axis=1))
-
-    # Upper bound: nearest periodic image of any QM atom
-    upper = np.inf
-    for atom_r in r:
-        for vec in lattice_vectors: 
-            for sign in (+1, -1):
-                upper = min(upper, np.linalg.norm(atom_r + sign * vec))
-
-    assert lower < upper, f"QM region too large for box: lower={lower:.2f}, upper={upper:.2f} Å"
-
-    # Pick midpoint, rounded conservatively
-    rcut_hcore = int((lower + upper) / 2)
-    rcut_ewald = int(floor(np.min(np.diag(lattice_vectors)) / 2))
-
-    return rcut_hcore, rcut_ewald
-
 qm_atoms = get_qm_atoms_from_pdb(qm_region_pdb)
 print(f"QM atoms: {qm_atoms}")
-
-lattice_vectors = get_lattice_vectors_from_pdb(pdbfile)
-print(f"Lattice vectors:\n{lattice_vectors}")
-
-rcut_hcore, rcut_ewald = get_rcut_hcore_ewald(frag, qm_atoms, lattice_vectors)
-print(f"Chosen rcut_hcore = {rcut_hcore} Å, rcut_ewald = {rcut_ewald} Å")
 
 # MM theory built from the System XML (carries the 12-6-4 forces) + topology PDB
 mm = ash.OpenMMTheory(
@@ -93,9 +42,6 @@ qm_pyscf = ash.PySCFTheory(
     ecp={"Lu": "def2-ecp"},
     densityfit=True, 
     platform="GPU",
-    #PBC_lattice_vectors=lattice_vectors,
-    rcut_hcore=rcut_hcore, 
-    rcut_ewald=rcut_ewald,
     write_chkfile_name=None,
     noautostart=True, 
     guess="atom",
