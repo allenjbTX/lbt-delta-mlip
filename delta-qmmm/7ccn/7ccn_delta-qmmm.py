@@ -1,10 +1,12 @@
 from ash import *
 import numpy as np
 import os
+import sys
 
-xmlsystemfile = "../../md/7ccn/relaxation/system.xml"
-topology_pdb = "../../md/7ccn/relaxation/system.pdb"
-qm_region_pdb = "7ccn_qmregion.pdb"
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+xmlsystemfile = os.path.join(_SCRIPT_DIR, "../../md/7ccn/relaxation/system.xml")
+topology_pdb  = os.path.join(_SCRIPT_DIR, "../../md/7ccn/relaxation/system.pdb")
+qm_region_pdb = os.path.join(_SCRIPT_DIR, "7ccn_qmregion.pdb")
 
 def get_qm_atoms_from_pdb(pdbfile):
     qm_atoms = []
@@ -46,7 +48,7 @@ def cleanup_results_files():
             os.remove(file)
 
 if __name__ == "__main__":
-    pdbfile = "../../md/7ccn/production/snapshots/snapshot_0000.pdb"
+    pdbfile = sys.argv[1]
     snapshot_number = pdbfile.split("/")[-1].split(".")[0]
     frag = ash.Fragment(pdbfile = pdbfile)
     qm_atoms = get_qm_atoms_from_pdb(qm_region_pdb)
