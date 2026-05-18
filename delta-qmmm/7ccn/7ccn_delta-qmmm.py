@@ -3,6 +3,8 @@ import numpy as np
 import os
 import sys
 
+charge = -1
+multiplicity = 1
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 xmlsystemfile = os.path.join(_SCRIPT_DIR, "../../md/7ccn/relaxation/system.xml")
 topology_pdb  = os.path.join(_SCRIPT_DIR, "../../md/7ccn/relaxation/system.pdb")
@@ -30,6 +32,8 @@ def esp_at_points(qm_coords, charge_coords, charges):
 def save_results_to_npz(frag, dftmm, xtbmm, esp, filename):
     np.savez(
         filename,
+        charge = charge,
+        multiplicity = multiplicity,
         qm_coords = frag.coords[dftmm.qmatoms],
         qm_elems = np.array(frag.elems)[dftmm.qmatoms],
         delta_e = dftmm.QMenergy - xtbmm.QMenergy,
@@ -90,8 +94,8 @@ if __name__ == "__main__":
         mm_theory = mm, 
         qmatoms = qm_atoms,
         embedding = "elstat", 
-        qm_charge = -1,
-        qm_mult = 1, 
+        qm_charge = charge,
+        qm_mult = multiplicity,
         printlevel = 2
     )
 
@@ -101,8 +105,8 @@ if __name__ == "__main__":
         mm_theory = mm, 
         qmatoms = qm_atoms,
         embedding = "elstat", 
-        qm_charge = -1,
-        qm_mult = 1, 
+        qm_charge = charge,
+        qm_mult = multiplicity,
         printlevel = 2
     )
 
